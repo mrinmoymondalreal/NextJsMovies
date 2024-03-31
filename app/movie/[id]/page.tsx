@@ -1,13 +1,19 @@
 import { Movie } from "@/lib/types/movie";
+import { Metadata } from "next";
 import { redirect } from "next/navigation";
 
-async function fetchMovie(id: string){
-  let movies: Movie[] = await (await fetch("http://localhost:3000/movie/data.json")).json();
+async function fetchMovie(id: string) {
+  const movies: Movie[] = Object.values(await import('@/public/movie/data.json')) as Movie[];
   let data: Movie | undefined = movies.find((movie: Movie) => movie.id == parseInt(id));
   return data;
 }
 
-export default async function Page({ params }: { params: { id: string } }) {
+type Props = {
+  params: { id: string };
+};
+
+
+export default async function Page({ params }: Props) {
   let data: Movie | undefined = await fetchMovie(params.id);
   if(!data) return redirect('/');
   return (
@@ -24,3 +30,14 @@ export default async function Page({ params }: { params: { id: string } }) {
     </main>
   );
 }
+
+export async function generateMetadata({
+  params,
+}: Props): Promise<Metadata> {
+  const movie: Movie | undefined =  await fetchMovie(params.id);
+  return {
+    title: movie?.title,
+    description: movie?.extract,
+  };
+}
+

@@ -1,11 +1,15 @@
 import { Movie } from "@/lib/types/movie";
 
-async function fetchMovie(){
-  let data: Movie[] = [];
-  let movies: Movie[] = await (await fetch("http://localhost:3000/movie/data.json")).json();
-  for(let i = 0;i < 10;i++){
-    data.push(movies[Math.floor(Math.random() * movies.length)]);
+
+async function fetchMovie(): Promise<Movie[]> {
+  const movies: Movie[] = Object.values(await import('@/public/movie/data.json')) as Movie[];
+  
+  const data: Movie[] = [];
+  for (let i = 0; i < 10; i++) {
+    const randomIndex = Math.floor(Math.random() * movies.length);
+    data.push(movies[randomIndex]);
   }
+  
   return data;
 }
 

@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Movie } from "./types/movie";
 import Link from "next/link";
 
 export default function SearchForm(){
   let [movie, setData] = useState<Movie[]>([]);
+  let inputRef = useRef<HTMLInputElement>(null);
 
   const Search = async (e: any)=>{
     let data = await (await fetch(`/api/search?q=${e.target.value}`)).json();
@@ -13,12 +14,29 @@ export default function SearchForm(){
     setData(data.slice(0, 10));
   }
 
+  const keyDownHandler = (event: KeyboardEvent) => {
+    if (event.ctrlKey && event.key === "k") {
+      event.preventDefault();
+      inputRef.current?.focus();
+    }
+  };  
+
+  useEffect(()=>{
+    window.addEventListener("keydown", keyDownHandler);
+    return () => {
+      window.removeEventListener("keydown", keyDownHandler);
+    };
+  });
+
   return (
     <>
     <form className="group" action="/search">
-      <input onChange={Search} className="border group-focus:w-2 border-black px-2 py-1" type="text" name="movie" placeholder="Search (Ctrl+K)" />
+      <input ref={inputRef} onChange={Search} className="border border-black px-2 py-1" type="text" name="movie" placeholder="Search (Ctrl+K)" />
     </form>
-    <div className="bg-white  rounded-md absolute pt-4 min-w-64 max-w-80 max-h-24 overflow-y-scroll">
+    {
+    movie.length > 0 
+    && 
+    <div className="bg-white rounded-md absolute pt-4 min-w-64 max-w-80 max-h-64 overflow-y-scroll">
       {movie.map((data: Movie)=>(
       <Link href={`/movie/${data.id}`} onClick={()=>setData([])} className="flex px-4 py-2 hover:bg-gray-100" key={data.id}>
         <div>
@@ -33,6 +51,7 @@ export default function SearchForm(){
       </Link>
       ))}
     </div>
+    }
     </>
   );
 }
