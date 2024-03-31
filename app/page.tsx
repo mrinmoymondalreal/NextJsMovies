@@ -2,12 +2,13 @@ import { Movie } from "@/lib/types/movie";
 
 
 async function fetchMovie(): Promise<Movie[]> {
-  const movies: Movie[] = Object.values(await import('@/public/movie/data.json')) as Movie[];
+  const _m: unknown = Object.values(await import('@/public/movie/data.json'));
   
   const data: Movie[] = [];
   for (let i = 0; i < 10; i++) {
+    let movies: Movie[] = _m as Movie[];
     const randomIndex = Math.floor(Math.random() * movies.length);
-    data.push(movies[randomIndex]);
+    data.push(movies[randomIndex] as Movie);
   }
   
   return data;

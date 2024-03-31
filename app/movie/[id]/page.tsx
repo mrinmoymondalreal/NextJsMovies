@@ -3,8 +3,9 @@ import { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 async function fetchMovie(id: string) {
-  const movies: Movie[] = Object.values(await import('@/public/movie/data.json')) as Movie[];
-  let data: Movie | undefined = movies.find((movie: Movie) => movie.id == parseInt(id));
+  const _m: unknown = Object.values(await import('@/public/movie/data.json'));
+  let movies: Movie[] = _m as Movie[]; 
+  let data: Movie | undefined = (movies as Movie[]).find((movie: Movie) => movie.id == parseInt(id));
   return data;
 }
 
